@@ -1,0 +1,3 @@
+# Project exclude paths
+/harvard-rs-ear/target/
+/harvard-rs-ejb/target/
