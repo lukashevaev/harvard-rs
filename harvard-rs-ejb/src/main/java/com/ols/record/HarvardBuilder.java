@@ -1,30 +1,30 @@
 package com.ols.record;
 
 
-import com.darkprograms.speech.translator.GoogleTranslate;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
 public class HarvardBuilder {
-    private String recordType;
+    private final String recordType;
     private final Map<String, String> fields;
 
-    public HarvardBuilder(Map<String, String> fields) throws Exception {
+    public HarvardBuilder(Map<String, String> fields) {
         this.fields = fields;
-        //recordType = fields.get("recordType");
         TypeDefiner typeDefiner = new TypeDefiner(fields);
-        setRecordType(typeDefiner.getRecordType());
+        this.recordType = typeDefiner.getRecordType();
         refactorFields();
     }
 
-    private void setRecordType(String recordType){
-        this.recordType = recordType;
-    }
-
-    private void refactorFields() throws Exception {
+    private void refactorFields() {
         StringBuilder russianTitle = new StringBuilder();
         boolean isEng = fields.values()
                 .stream()
@@ -59,12 +59,6 @@ public class HarvardBuilder {
                 fields.put("address", "Saint-Petersburg");
             fields.put("address", fields.get("address") + ", Russia");
         }
-
-
-
-
-
-
 
 
         /*if (PatternFactory.russianPattern.matcher(fields.get("author").toLowerCase()).find()) {
@@ -110,8 +104,7 @@ public class HarvardBuilder {
             fields.put("university", fields.get("publisher"));
     }
 
-    public Document build() {
-        System.out.println(recordType);
+    public org.w3c.dom.Document buildHarvard(){
         String delimiter = ", ";
         Document document = Jsoup.parse("<html></html>");
         document.body().appendText(fields.get("author")).appendText("(")
@@ -157,11 +150,7 @@ public class HarvardBuilder {
                 break;
         }
 
-
-
-
-
-
-        return  document;
+        W3CDom w3cDom = new W3CDom();
+        return w3cDom.fromJsoup(document);
     }
 }

@@ -14,19 +14,17 @@
 
     <name>Harvard Record Schema EAR module</name>
 
-
-
     <dependencies>
         <dependency>
             <groupId>com.ols.record</groupId>
-            <artifactId>bibtex-rs-ejb</artifactId>
+            <artifactId>harvard-rs-ejb</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <type>ejb</type>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>bibtex-rs</finalName>
+        <finalName>harvard-rs</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

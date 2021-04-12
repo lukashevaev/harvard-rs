@@ -4,7 +4,7 @@ package com.ols.record;
 import com.ols.z3950.record.Record;
 import org.w3c.dom.Document;
 
-//import javax.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import javax.ejb.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
@@ -19,10 +19,9 @@ import java.util.logging.Logger;
 @Startup
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 @TransactionManagement(TransactionManagementType.BEAN)
-@Remote(RecordSchema.class)
-@EJB(name = "java:global/ruslan/recordSchema/harvard", beanInterface = RecordSchema.class , beanName = "harvard")
-public class HarvardRecordSchema implements RecordSchema {
-    private static final String URI = "bibtex";
+@Remote(BeanSchema.class)
+@EJB(name = "java:global/ruslan/recordSchema/harvard", beanInterface = BeanSchema.class , beanName = "harvard")
+public class HarvardRecordSchema implements BeanSchema {
     private static final Logger log = Logger.getLogger(HarvardRecordSchema.class
             .getName());
     private static final TransformerFactory transformerFactory = TransformerFactory
@@ -32,7 +31,7 @@ public class HarvardRecordSchema implements RecordSchema {
     @EJB(lookup = "java:global/ruslan/recordSchema/ruslan", beanInterface = RecordSchema.class)
     private RecordSchema ruslanRecordSchema;
 
-    //@PostConstruct
+    @PostConstruct
     public void init() {
         log.fine("Preparing XSL templates");
         log.fine(Objects.requireNonNull(getClass().getClassLoader().getResource("RUSMARC2Harvard.xsl")).toString());
@@ -48,33 +47,33 @@ public class HarvardRecordSchema implements RecordSchema {
     }
 
     @Override
-    public String getURI() {
-        return URI;
+    public Object getTransformedRecord(byte[] record, String encoding) throws Exception {
+        Document src = ruslanRecordSchema.toDocument(record, encoding);
+        HarvardBuilder builder = getBuilder(src);
+        return builder.buildHarvard();
+
     }
+
+    @Override
+    public String getMimeType() {
+        return "application/html";
+    }
+
+    private HarvardBuilder getBuilder(Document src) throws Exception {
+        Transformer transformer = templates.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        DOMResult result = new DOMResult();
+        transformer.transform(new DOMSource(src), result);
+        //получаем поля из схемы для составления формата
+        Map<String, String> fields = XmlParser.parse((Document) result.getNode());
+        return new HarvardBuilder(fields);
+    }
+
+
 
     @Override
     public String toString(Record record, String encoding) throws Exception {
         return ruslanRecordSchema.toString(record, encoding);
-    }
-
-   //@Override
-   //public Document toDocument(Record record, String encoding) throws Exception {
-   //    return transformSchema(ruslanRecordSchema.toDocument(record, encoding));
-   //}
-
-    //@Override
-    public org.jsoup.nodes.Document transformSchema(Document src) throws Exception {
-        Transformer transformer = templates.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-
-        DOMResult result = new DOMResult();
-        transformer.transform(new DOMSource(src), result);
-
-        PatternFactory.createPatternsForType();
-        XmlParser parser = new XmlParser((Document) result.getNode());
-        Map<String, String> fields = parser.getFields();
-        HarvardBuilder builder = new HarvardBuilder(fields);
-        return builder.build();
     }
 
     @Override
@@ -84,7 +83,9 @@ public class HarvardRecordSchema implements RecordSchema {
 
     @Override
     public Record denormalize(Record record, String encoding) {
-        return ruslanRecordSchema.denormalize(record, encoding);	}
+        return ruslanRecordSchema.denormalize(record, encoding);
+    }
+
 
 
 }
