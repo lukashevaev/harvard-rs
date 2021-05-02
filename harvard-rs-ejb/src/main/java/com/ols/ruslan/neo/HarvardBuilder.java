@@ -1,15 +1,9 @@
 package com.ols.ruslan.neo;
 
 
-import org.jsoup.Jsoup;
-import org.jsoup.helper.StringUtil;
-import org.jsoup.nodes.Document;
-
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HarvardBuilder {
     private final String recordType;
@@ -50,7 +44,7 @@ public class HarvardBuilder {
             }
         }
         instance.setYear("(" + instance.getYear() + ")");
-        instance.setTitle("'" + instance.getTitle() + "'");
+        instance.setTitle("\"" + instance.getTitle() + "\"");
         if (PatternFactory.universityPattern.matcher(instance.getPublisher()).find())
             instance.setUniversity(instance.getPublisher());
     }
