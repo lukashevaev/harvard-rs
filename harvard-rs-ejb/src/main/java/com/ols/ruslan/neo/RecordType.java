@@ -1,4 +1,4 @@
-package com.ols.record;
+package com.ols.ruslan.neo;
 
 public enum RecordType {
     BOOK,

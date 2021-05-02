@@ -1,14 +1,9 @@
-package com.ols.record;
+package com.ols.ruslan.neo;
 
 
 import org.jsoup.Jsoup;
-import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
@@ -21,10 +16,14 @@ public class HarvardBuilder {
         this.fields = fields;
         TypeDefiner typeDefiner = new TypeDefiner(fields);
         this.recordType = typeDefiner.getRecordType();
-        refactorFields();
+        try {
+            refactorFields();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void refactorFields() {
+    private void refactorFields() throws IOException {
         StringBuilder russianTitle = new StringBuilder();
         boolean isEng = fields.values()
                 .stream()
@@ -34,15 +33,15 @@ public class HarvardBuilder {
             fields.put("address", Transliterator.cyr2lat(fields.get("address")));
             switch (recordType) {
                 case "BOOK":
-                    russianTitle.append(Transliterator.cyr2lat(fields.get("title")))
-                            .append("[")
-                          //  .append(GoogleTranslate.translate("en", fields.get("title")))
-                            .append("]");
+                    russianTitle.append(Transliterator.cyr2lat(fields.get("title")));
+                           /* .append("[")
+                            //.append(GoogleTranslate.translate("en", fields.get("title")))
+                            .append("]");*/
                     fields.put("title", russianTitle.toString());
                     break;
                 case "ARTICLE":
                     russianTitle.append("\"")
-                            //.append(GoogleTranslate.translate("en", fields.get("title")))
+                            .append(fields.get("title"))
                             .append("\"");
                     fields.put("title", russianTitle.toString());
                     fields.put("publisher", Transliterator.cyr2lat(fields.get("publisher")));
@@ -50,9 +49,9 @@ public class HarvardBuilder {
                 case "MASTERSTHESIS":
                 case "PHDSTHESIS":
                 case "ABSTRACT":
-                    russianTitle.append("\"")
+                    /*russianTitle.append("\"")
                             //.append(GoogleTranslate.translate("en", fields.get("title")))
-                            .append("\"");
+                            .append("\"");*/
                     break;
             }
             if (PatternFactory.spbPattern.matcher(fields.get("address").toLowerCase()).find())
@@ -65,20 +64,20 @@ public class HarvardBuilder {
             fields.put("author", Transliterator.cyr2lat(fields.get("author")));
         }
         if (PatternFactory.russianPattern.matcher(fields.get("title").toLowerCase()).find()){
-            StringBuilder russianTitle = new StringBuilder();
+            StringBuilder russianTitle2 = new StringBuilder();
             russianTitle.append(Transliterator.cyr2lat(fields.get("title")))
                         .append("[")
                         .append(GoogleTranslate.translate("en", fields.get("title")))
                         .append("]");
-            fields.put("title", russianTitle.toString());
-        }
+            fields.put("title", russianTitle2.toString());
+        }*/
 
         //for (Map.Entry<String, String> entry : fields.entrySet()) {
         //    fields.put(entry.getKey(), GoogleTranslate.translate("en", entry.getValue()));
         //}
 
 
-        fields.put("author", fields.get("author").substring(0, fields.get("author").length() - 1));*/
+        //fields.put("author", fields.get("author").substring(0, fields.get("author").length() - 1));
         String[] authors = fields.get("author").split("-");
         switch (authors.length){
             case 1: {
@@ -104,7 +103,7 @@ public class HarvardBuilder {
             fields.put("university", fields.get("publisher"));
     }
 
-    public org.w3c.dom.Document buildHarvard(){
+    public String buildHarvard(){
         String delimiter = ", ";
         Document document = Jsoup.parse("<html></html>");
         document.body().appendText(fields.get("author")).appendText("(")
@@ -150,7 +149,8 @@ public class HarvardBuilder {
                 break;
         }
 
-        W3CDom w3cDom = new W3CDom();
-        return w3cDom.fromJsoup(document);
+        /*W3CDom w3cDom = new W3CDom();
+        return w3cDom.fromJsoup(document);*/
+        return document.toString();
     }
 }

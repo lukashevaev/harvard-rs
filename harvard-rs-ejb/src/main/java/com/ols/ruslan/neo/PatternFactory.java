@@ -1,4 +1,4 @@
-package com.ols.record;
+package com.ols.ruslan.neo;
 
 import java.util.*;
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package com.ols.record;
+package com.ols.ruslan.neo;
 
 public class Transliterator {
     public static String cyr2lat(char ch){

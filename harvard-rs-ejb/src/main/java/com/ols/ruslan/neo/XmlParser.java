@@ -1,6 +1,5 @@
-package com.ols.record;
+package com.ols.ruslan.neo;
 
-import jdk.internal.jline.internal.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -13,7 +12,7 @@ import java.util.stream.IntStream;
 
 public abstract class XmlParser {
     //получаем все поля из схемы
-    public static Map<String, String> parse(@Nullable final Document document) {
+    public static Map<String, String> parse(final Document document) {
         if (document == null || document.getDocumentElement() == null) return Collections.emptyMap();
         else {
             Node book = document.getDocumentElement().getFirstChild();
