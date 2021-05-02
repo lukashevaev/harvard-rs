@@ -2,19 +2,23 @@ package com.ols.ruslan.neo;
 
 
 import org.jsoup.Jsoup;
+import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HarvardBuilder {
     private final String recordType;
-    private final Map<String, String> fields;
+    private final HarvardInstance instance;
+
 
     public HarvardBuilder(Map<String, String> fields) {
-        this.fields = fields;
-        TypeDefiner typeDefiner = new TypeDefiner(fields);
+        instance = new HarvardInstance(fields);
+        TypeDefiner typeDefiner = new TypeDefiner(instance);
         this.recordType = typeDefiner.getRecordType();
         try {
             refactorFields();
@@ -24,133 +28,63 @@ public class HarvardBuilder {
     }
 
     private void refactorFields() throws IOException {
-        StringBuilder russianTitle = new StringBuilder();
-        boolean isEng = fields.values()
-                .stream()
-                .noneMatch(field -> PatternFactory.russianPattern.matcher(field.toLowerCase()).find());
-        if (!isEng) {
-            fields.put("author", Transliterator.cyr2lat(fields.get("author")));
-            fields.put("address", Transliterator.cyr2lat(fields.get("address")));
-            switch (recordType) {
-                case "BOOK":
-                    russianTitle.append(Transliterator.cyr2lat(fields.get("title")));
-                           /* .append("[")
-                            //.append(GoogleTranslate.translate("en", fields.get("title")))
-                            .append("]");*/
-                    fields.put("title", russianTitle.toString());
+        if (!instance.getAuthor().equals("")) {
+            String[] authors = instance.getAuthor().split("-");
+            switch (authors.length) {
+                case 1: {
+                    instance.setAuthor(authors[0].substring(0, authors[0].length() - 1));
                     break;
-                case "ARTICLE":
-                    russianTitle.append("\"")
-                            .append(fields.get("title"))
-                            .append("\"");
-                    fields.put("title", russianTitle.toString());
-                    fields.put("publisher", Transliterator.cyr2lat(fields.get("publisher")));
+                }
+                case 2: {
+                    instance.setAuthor(authors[0].substring(0, authors[0].length() - 1) + " and " + authors[1].substring(0, authors[1].length() - 1));
                     break;
-                case "MASTERSTHESIS":
-                case "PHDSTHESIS":
-                case "ABSTRACT":
-                    /*russianTitle.append("\"")
-                            //.append(GoogleTranslate.translate("en", fields.get("title")))
-                            .append("\"");*/
+                }
+                default: {
+                    StringBuilder author = new StringBuilder();
+                    Arrays.stream(authors).forEach(author::append);
+                    author.replace(author.lastIndexOf(","), author.lastIndexOf(",") + 1, "");
+                    author.replace(author.lastIndexOf(","), author.lastIndexOf(",") + 1, " and ");
+                    instance.setAuthor(author.toString());
                     break;
+                }
             }
-            if (PatternFactory.spbPattern.matcher(fields.get("address").toLowerCase()).find())
-                fields.put("address", "Saint-Petersburg");
-            fields.put("address", fields.get("address") + ", Russia");
         }
-
-
-        /*if (PatternFactory.russianPattern.matcher(fields.get("author").toLowerCase()).find()) {
-            fields.put("author", Transliterator.cyr2lat(fields.get("author")));
-        }
-        if (PatternFactory.russianPattern.matcher(fields.get("title").toLowerCase()).find()){
-            StringBuilder russianTitle2 = new StringBuilder();
-            russianTitle.append(Transliterator.cyr2lat(fields.get("title")))
-                        .append("[")
-                        .append(GoogleTranslate.translate("en", fields.get("title")))
-                        .append("]");
-            fields.put("title", russianTitle2.toString());
-        }*/
-
-        //for (Map.Entry<String, String> entry : fields.entrySet()) {
-        //    fields.put(entry.getKey(), GoogleTranslate.translate("en", entry.getValue()));
-        //}
-
-
-        //fields.put("author", fields.get("author").substring(0, fields.get("author").length() - 1));
-        String[] authors = fields.get("author").split("-");
-        switch (authors.length){
-            case 1: {
-                fields.put("author", authors[0].substring(0, authors[0].length() - 1));
-                break;
-            }
-            case 2: {
-                fields.put("author", authors[0].substring(0, authors[0].length() - 1) + " and " + authors[1].substring(0, authors[1].length() - 1));
-                break;
-            }
-            default: {
-                StringBuilder author = new StringBuilder();
-                Arrays.stream(authors).forEach(author::append);
-                author.replace(author.lastIndexOf(","), author.lastIndexOf(",") + 1, "" );
-                author.replace(author.lastIndexOf(","), author.lastIndexOf(",") + 1, " and " );
-                fields.put("author", author.toString());
-                break;
-            }
-
-        }
-        //fields.put("year", "(" + fields.get("year").compareTo(")"));
-        if (PatternFactory.universityPattern.matcher(fields.get("publisher")).find())
-            fields.put("university", fields.get("publisher"));
+        instance.setYear("(" + instance.getYear() + ")");
+        instance.setTitle("'" + instance.getTitle() + "'");
+        if (PatternFactory.universityPattern.matcher(instance.getPublisher()).find())
+            instance.setUniversity(instance.getPublisher());
     }
 
-    public String buildHarvard(){
-        String delimiter = ", ";
-        Document document = Jsoup.parse("<html></html>");
-        document.body().appendText(fields.get("author")).appendText("(")
-                        .appendText(fields.get("year")).appendText(")")
-                        .appendText(delimiter);
-        if (recordType.equals("BOOK"))
-                        document.body().appendElement("i")
-                                .appendText("'")
-                                .appendText(fields.get("title"))
-                                .appendText("'");
-        else if (recordType.equals("ARTICLE") || recordType.equals("PROCEEDINGS") || recordType.equals("ABSTRACT")){
-            document.body()
-                    .appendText("'")
-                    .appendText(fields.get("title"))
-                    .appendText("'");
-        } else document.body().appendText(fields.get("title"));
-        document.body().appendText(delimiter);
-        switch (recordType) {
-            case "ARTICLE":
-                document.body().appendElement("i")
-                        .appendText(fields.get("journal")).appendText(delimiter);
-                document.body().appendText(fields.get("volume")).appendText(delimiter);
-                document.body().appendText(fields.get("pages")).appendText(delimiter);
-                break;
-            case "BOOK":
-                document.body().appendText(fields.get("publisher")).appendText(delimiter);
-                document.body().appendText(fields.get("address")).appendText(delimiter);
-                break;
-            case "PROCEEDINGS":
-                document.body().appendText(fields.get("conference")).appendText(delimiter);
-                document.body().appendText(fields.get("address")).appendText(delimiter);
-                document.body().appendText(fields.get("date")).appendText(delimiter);
-                document.body().appendText(fields.get("pages")).appendText(delimiter);
-                break;
-            case "ABSTRACT":
-                document.body().appendText("Abstract of " + (PatternFactory.getPatternsForType()
-                        .get(RecordType.MASTERSTHESIS)
-                        .matcher(fields.get("recordType").toLowerCase()).find() ? "Ph. Sc" : "Ph. D")
-                ).appendText(delimiter);
-                ///////////// Specialization
-//            document.body().appendText(fields.get("university")).appendText(delimiter);
-                document.body().appendText(fields.get("address"));
-                break;
+    public String buildHarvard() {
+        StringBuilder builder = new StringBuilder();
+        Map<String, String> fields = instance.getFields();
+        fields.entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
+        builder.append(instance.getAuthor())
+                .append(instance.getYear())
+                .append(instance.getTitle());
+        if ("ARTICLE".equals(recordType)) {
+            builder.append(instance.getJournal());
+            builder.append(instance.getVolume());
+            builder.append(instance.getPages());
+        } else if ("BOOK".equals(recordType)) {
+            builder.append(instance.getPublisher());
+            builder.append(instance.getAddress());
+        } else if ("PHDTHESIS".equals(recordType)) {
+            builder.append("Abstract of phdthesis dissertation");
+            builder.append(instance.getUniversity());
+            builder.append(instance.getAddress());
+        } else if ("MASTERSTHESIS".equals(recordType)) {
+            builder.append("Abstract of mastersthesis dissertation");
+            builder.append(instance.getUniversity());
+            builder.append(instance.getAddress());
+        } else if ("PROCEEDINGS".equals(recordType)) {
+            builder.append(instance.getConference());
+            builder.append(instance.getAddress());
+            builder.append(instance.getData());
+            builder.append(instance.getPages());
         }
-
-        /*W3CDom w3cDom = new W3CDom();
-        return w3cDom.fromJsoup(document);*/
-        return document.toString();
+        builder.trimToSize();
+        builder.deleteCharAt(builder.length() - 2);
+        return builder.toString().replace(",,", ",");
     }
 }

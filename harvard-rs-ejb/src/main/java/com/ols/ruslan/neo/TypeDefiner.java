@@ -4,14 +4,14 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class TypeDefiner {
-    private final Map<String, String> fields;
     private String recordType;
     private final Map<RecordType, Pattern> patternsForType;
+    private final HarvardInstance instance;
 
-    public TypeDefiner(Map<String, String> fields){
+    public TypeDefiner(HarvardInstance instance){
         patternsForType = PatternFactory.getPatternsForType();
-        this.fields = fields;
-        recordType = fields.get("recordType").toLowerCase();
+        this.instance = instance;
+        recordType = instance.getRecordType().toLowerCase();
         defineType();
     }
 
@@ -19,8 +19,8 @@ public class TypeDefiner {
         String oldType = recordType;
         //patternsLookup
         for (Map.Entry<RecordType, Pattern> entry : patternsForType.entrySet()) {
-            if (entry.getValue().matcher(oldType).find() || entry.getValue().matcher(fields.get("title").toLowerCase()).find()) {
-                recordType = entry.getKey().toString();
+            if (entry.getValue().matcher(oldType).find() || entry.getValue().matcher(instance.getTitle().toLowerCase()).find()) {
+                recordType = "BOOK";
                 break;
             }
         }

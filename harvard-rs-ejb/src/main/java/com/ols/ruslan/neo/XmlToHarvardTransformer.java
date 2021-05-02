@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 @Singleton(name = "XmlToHarvardTransformer")
 @Startup
 @Remote(MediaTypeTransformerFacade.class)
-@EJB(name = "java:global/ruslan/mediaType/application/xml/application/html", beanInterface = MediaTypeTransformerFacade.class)
+@EJB(name = "java:global/ruslan/mediaType/application/xml/application/harvard", beanInterface = MediaTypeTransformerFacade.class)
 public class XmlToHarvardTransformer implements MediaTypeTransformerFacade {
     private static final Logger log = Logger.getLogger(XmlToHarvardTransformer.class
             .getName());
