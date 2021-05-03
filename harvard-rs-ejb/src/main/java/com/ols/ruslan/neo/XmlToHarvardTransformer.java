@@ -47,17 +47,17 @@ public class XmlToHarvardTransformer implements MediaTypeTransformerFacade {
 
     @Override
     public byte[] transform(byte[] content, String encoding) throws Exception {
-        //Setting a transformer to transform one xml to another
+        // Создаем трансформер для преобразования одного xml в другой
         Transformer transformer = templates.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         DOMResult result = new DOMResult();
 
-        //Setting a source Document form byte-array
+        // Создаем источник для преобразования из поступившего массива байт
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse(new ByteArrayInputStream(content));
 
-        //Transforming and parsing
+        // Трансформация,парсинг и создание нового формата
         transformer.transform(new DOMSource(document), result);
         Map<String, String> fields = XmlParser.parse((Document) result.getNode());
         HarvardBuilder bibTexBuilder = new HarvardBuilder(fields);

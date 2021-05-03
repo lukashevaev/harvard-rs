@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Получаем все поля из схемы
+ */
 public abstract class XmlParser {
-    //получаем все поля из схемы
     public static Map<String, String> parse(final Document document) {
         if (document == null || document.getDocumentElement() == null) return Collections.emptyMap();
         else {

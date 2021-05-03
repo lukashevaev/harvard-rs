@@ -27,6 +27,7 @@ public class HarvardBuilder {
     }
 
     private void refactorFields() throws IOException {
+        // Запись вида автор1,автор2, ... авторn and авторn+1
         if (!instance.getAuthor().equals("")) {
             String[] authors = instance.getAuthor().split("-");
             switch (authors.length) {
@@ -48,6 +49,7 @@ public class HarvardBuilder {
                 }
             }
         }
+        // Год должен быть указан в ()
         instance.setYear("(" + instance.getYear() + ")");
         if (PatternFactory.universityPattern.matcher(instance.getPublisher()).find())
             instance.setUniversity(instance.getPublisher());
