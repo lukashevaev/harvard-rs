@@ -95,6 +95,11 @@ public class HarvardBuilder {
             builder.append(instance.getAddress());
             builder.append(instance.getData());
             builder.append(instance.getPages());
+        } else if ("INPROCEEDINGS".equals(recordType)) {
+            builder.append(instance.getConference());
+            builder.append(instance.getAddress());
+            builder.append(instance.getData());
+            builder.append(instance.getPages());
         }
         builder.trimToSize();
         builder.deleteCharAt(builder.length() - 2);
