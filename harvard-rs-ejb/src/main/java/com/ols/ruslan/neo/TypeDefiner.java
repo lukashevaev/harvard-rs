@@ -20,10 +20,20 @@ public class TypeDefiner {
         //patternsLookup
         for (Map.Entry<RecordType, Pattern> entry : patternsForType.entrySet()) {
             if (entry.getValue().matcher(oldType).find() || entry.getValue().matcher(instance.getTitle().toLowerCase()).find()) {
-                recordType = "BOOK";
+                recordType = entry.getKey().toString();
                 break;
             }
         }
+
+        if ("PROCEEDINGS".equals(recordType) && (!instance.getAuthor().equals("") || !instance.getTitle().equals(""))) {
+            recordType = "INPROCEEDINGS";
+            return;
+        }
+
+        if ("BOOK".equals(recordType)) {
+            if (PatternFactory.pagesPattern.matcher(instance.getPages()).find()) recordType = "INBOOK";
+        }
+
     }
     public String getRecordType(){
         return recordType;

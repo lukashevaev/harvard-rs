@@ -6,10 +6,52 @@ import java.util.regex.Pattern;
 /**
  * This class is used to create patterns to find the required fields and to check them for the correct format.
  */
+
+
 public class PatternFactory {
 
     private final Map<String, String> patternForTags = new LinkedHashMap<String, String>();
     private static final Map<RecordType, Pattern> patternsForType = new HashMap<>();
+
+    public PatternFactory() {
+        patternsForType.put(RecordType.BOOK,
+                Pattern.compile("(" +
+                        "энциклопедия|" +
+                        "encyclopaedia|" +
+                        "сборник|" +
+                        "собрание|" +
+                        "сочинения|" +
+                        "работы|" +
+                        "((в|in)\\s\\d+-?х?\\s(т|ч|vols)\\.?)$)"));
+        patternsForType.put(RecordType.PROCEEDINGS,
+                Pattern.compile("(proceedings|" +
+                        "of\\s*(a|the)\\s*conference|" +
+                        "conference|" +
+                        "proceedings\\s*of|" +
+                        "of\\s*(a|the).*\\s*colloquium|" +
+                        "of\\s*symposia|" +
+                        "symposium|" +
+                        "of\\s*(a|the)\\s*congress)"));
+        patternsForType.put(RecordType.INPROCEEDINGS,
+                Pattern.compile("inproceedings"));
+        patternsForType.put(RecordType.ARTICLE,
+                Pattern.compile("(журнал|" +
+                        "journal|" +
+                        "статья|" +
+                        "article)"));
+        patternsForType.put(RecordType.ABSTRACT,
+                Pattern.compile("(abstract\\s*of|автореферат)"));
+        patternsForType.put(RecordType.MASTERSTHESIS,
+                Pattern.compile("(дис.*маг|" +
+                        "(master(s)?)?\\s*thesis\\s*((of)?\\smaster)?)"));
+        patternsForType.put(RecordType.PHDTHESIS,
+                Pattern.compile("дис.*канд"));
+        patternsForType.put(RecordType.PATENT,
+                Pattern.compile("patent"));
+        patternsForType.put(RecordType.ETHER,
+                Pattern.compile("ether"));
+    }
+
     /** For field "pages"
      * check if field matches pattern "digits-digits"
      * for example "10-20", "345-466"
@@ -45,45 +87,4 @@ public class PatternFactory {
     public static Pattern authorPattern = Pattern.compile("");
 
     public static Pattern russianPattern = Pattern.compile(".*[а-яА-Я].*");
-
-
-    /**
-     * This methods creates patterns that define a type of current record in method "defineType()" of class TypeDefiner
-     */
-    public static void createPatternsForType(){
-        patternsForType.put(RecordType.BOOK,
-                        Pattern.compile("(" +
-                                "энциклопедия|" +
-                                "encyclopaedia|" +
-                                "сборник|" +
-                                "собрание|" +
-                                "сочинения|" +
-                                "работы|" +
-                                "((в|in)\\s\\d+-?х?\\s(т|ч|vols)\\.?)$)"));
-        patternsForType.put(RecordType.PROCEEDINGS,
-                        Pattern.compile("(proceedings|" +
-                                "of\\s*(a|the)\\s*conference|" +
-                                "conference|" +
-                                "proceedings\\s*of|" +
-                                "of\\s*(a|the).*\\s*colloquium|" +
-                                "of\\s*symposia|" +
-                                "symposium|" +
-                                "of\\s*(a|the)\\s*congress)"));
-        patternsForType.put(RecordType.ARTICLE,
-                        Pattern.compile("(журнал|" +
-                                "journal|" +
-                                "статья|" +
-                                "article)"));
-        patternsForType.put(RecordType.ABSTRACT,
-                Pattern.compile("(abstract\\s*of|автореферат)"));
-        patternsForType.put(RecordType.MASTERSTHESIS,
-                        Pattern.compile("(дис.*маг|" +
-                                "(master(s)?)?\\s*thesis\\s*((of)?\\smaster)?)"));
-        patternsForType.put(RecordType.PHDTHESIS,
-                        Pattern.compile("дис.*канд"));
-        patternsForType.put(RecordType.PATENT,
-                        Pattern.compile("patent"));
-        patternsForType.put(RecordType.ETHER,
-                        Pattern.compile("ether"));
-    }
 }

@@ -7,6 +7,8 @@ public enum RecordType {
     PHDTHESIS,
     ABSTRACT,
     PROCEEDINGS,
+    INPROCEEDINGS,
+    INBOOK,
     PATENT,
     ETHER
 }

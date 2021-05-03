@@ -44,7 +44,6 @@ public class HarvardBuilder {
             }
         }
         instance.setYear("(" + instance.getYear() + ")");
-        instance.setTitle("\"" + instance.getTitle() + "\"");
         if (PatternFactory.universityPattern.matcher(instance.getPublisher()).find())
             instance.setUniversity(instance.getPublisher());
     }
@@ -53,6 +52,12 @@ public class HarvardBuilder {
         StringBuilder builder = new StringBuilder();
         Map<String, String> fields = instance.getFields();
         fields.entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
+        if ("INPROCEEDINGS".equals(recordType)
+                || "ARTICLE".equals(recordType)
+                || "PHDTHESIS".equals(recordType)
+                || "MASTERSTHESIS".equals(recordType)
+                || "INBOOK".equals(recordType)
+        ) instance.setTitle("\"" + instance.getTitle() + "\"");
         builder.append(instance.getAuthor())
                 .append(instance.getYear())
                 .append(instance.getTitle());
@@ -63,12 +68,18 @@ public class HarvardBuilder {
         } else if ("BOOK".equals(recordType)) {
             builder.append(instance.getPublisher());
             builder.append(instance.getAddress());
-        } else if ("PHDTHESIS".equals(recordType)) {
-            builder.append("Abstract of phdthesis dissertation");
+        } else if ("INBOOK".equals(recordType)) {
+            builder.append(instance.getTitleChapter());
+            builder.append(instance.getPublisher());
+            builder.append(instance.getAddress());
+            builder.append(instance.getPages());
+        }
+        else if ("PHDTHESIS".equals(recordType)) {
+            builder.append("Abstract of bachelor dissertation");
             builder.append(instance.getUniversity());
             builder.append(instance.getAddress());
         } else if ("MASTERSTHESIS".equals(recordType)) {
-            builder.append("Abstract of mastersthesis dissertation");
+            builder.append("Abstract of master dissertation");
             builder.append(instance.getUniversity());
             builder.append(instance.getAddress());
         } else if ("PROCEEDINGS".equals(recordType)) {
