@@ -30,7 +30,7 @@ public class XmlToHarvardTransformer implements MediaTypeTransformerFacade {
 
 
     @PostConstruct
-    public void startup() {
+    private void startup() {
         log.info("Startup");
         try {
             templates = transformerFactory.newTemplates(new StreamSource(

@@ -21,6 +21,11 @@ public class HarvardBuilder {
         }
     }
 
+    // Метод для выделения цифр из поля
+    public String getDigits(String field) {
+        return field.replaceAll("[^0-9]", "");
+    }
+
     private void refactorFields() throws IOException {
         if (!instance.getAuthor().equals("")) {
             String[] authors = instance.getAuthor().split("-");
@@ -69,6 +74,7 @@ public class HarvardBuilder {
             builder.append(instance.getPublisher());
             builder.append(instance.getAddress());
         } else if ("INBOOK".equals(recordType)) {
+            instance.setTitleChapter("в " + instance.getTitleChapter());
             builder.append(instance.getTitleChapter());
             builder.append(instance.getPublisher());
             builder.append(instance.getAddress());
