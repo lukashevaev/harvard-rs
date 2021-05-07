@@ -24,7 +24,7 @@ public class PatternFactory {
                         "собрание|" +
                         "сочинения|" +
                         "работы|" +
-                        "((в|in)\\s\\d+-?х?\\s(т|ч|vols)\\.?)$)"));
+                        "(в|in)\\s\\d+-?х?\\s(т|ч|vols)\\.?)$"));
         patternsForType.put(RecordType.PROCEEDINGS,
                 Pattern.compile("(proceedings|" +
                         "of\\s*(a|the)\\s*conference|" +
@@ -95,4 +95,6 @@ public class PatternFactory {
     public static Pattern authorPattern = Pattern.compile("");
 
     public static Pattern russianPattern = Pattern.compile(".*[а-яА-Я].*");
+
+    public static final Pattern journalPattern = Pattern.compile("журнал|journal");
 }

@@ -27,6 +27,8 @@ public class HarvardBuilder {
     }
 
     private void refactorFields() throws IOException {
+        instance.deleteRecordType();
+        if (!"".equals(instance.getVolume()) && !"".equals(instance.getNumber())) instance.deleteNumber();
         // Запись вида автор1,автор2, ... авторn and авторn+1
         if (!instance.getAuthor().equals("")) {
             String[] authors = instance.getAuthor().split("-");
@@ -57,8 +59,7 @@ public class HarvardBuilder {
 
     public String buildHarvard() {
         StringBuilder builder = new StringBuilder();
-        Map<String, String> fields = instance.getFields();
-        fields.entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
+        instance.getFields().entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
         if ("INPROCEEDINGS".equals(recordType)
                 || "ARTICLE".equals(recordType)
                 || "PHDTHESIS".equals(recordType)
@@ -100,6 +101,9 @@ public class HarvardBuilder {
             builder.append(instance.getAddress());
             builder.append(instance.getData());
             builder.append(instance.getPages());
+        } else {
+            builder = new StringBuilder();
+            instance.getFields().values().forEach(builder::append);
         }
         builder.trimToSize();
         builder.deleteCharAt(builder.length() - 2);

@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        /*XmlToHarvardTransformer transformer = new XmlToHarvardTransformer();
+        XmlToHarvardTransformer transformer = new XmlToHarvardTransformer();
         transformer.startup();
         InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("RUSMARC.xml");
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -25,7 +25,7 @@ public class Main {
         Document document = null;
         if (inputStream != null) document = docBuilder.parse(inputStream);
         byte[] bytes = getBytes(document);
-        System.out.println(Arrays.toString(transformer.transform(bytes, "UTF-8")));*/
+        System.out.println(Arrays.toString(transformer.transform(bytes, "UTF-8")));
     }
 
     public static byte[] getBytes(Document document) throws Exception {

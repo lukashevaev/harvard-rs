@@ -10,6 +10,10 @@ public class HarvardInstance {
 
     public HarvardInstance(Map<String, String> fields) {
         this.fields = fields;
+        if (!"".equals(getJournal())) {
+            fields.put("journal", getJournal());
+        }
+        fields.remove("journal_description");
     }
 
     public Map<String, String> getFields() {
@@ -135,7 +139,13 @@ public class HarvardInstance {
     }
 
     public String getJournal() {
-        return fields.get("journal") != null ? fields.get("journal") : "";
+        StringBuilder journal = new StringBuilder();
+        if (fields.get("journal") != null) journal.append(fields.get("journal"));
+        if (fields.get("journal_description") != null && PatternFactory.journalPattern.matcher(fields.get("journal_description").toLowerCase()).find()) {
+            journal.append(", ").append(fields.get("journal_description"));
+            setRecordType("journal");
+        }
+        return journal.toString();
     }
 
     public void setJournal(String journal) {
