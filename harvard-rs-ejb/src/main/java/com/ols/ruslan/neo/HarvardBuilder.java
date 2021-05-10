@@ -3,7 +3,9 @@ package com.ols.ruslan.neo;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HarvardBuilder {
     private final String recordType;
@@ -28,6 +30,7 @@ public class HarvardBuilder {
 
     private void refactorFields() throws IOException {
         instance.deleteRecordType();
+        instance.setTitleChapter("в " + instance.getTitleChapter());
         if (!"".equals(instance.getVolume()) && !"".equals(instance.getNumber())) instance.deleteNumber();
         // Запись вида автор1,автор2, ... авторn and авторn+1
         if (!instance.getAuthor().equals("")) {
@@ -55,6 +58,14 @@ public class HarvardBuilder {
         instance.setYear("(" + instance.getYear() + ")");
         if (PatternFactory.universityPattern.matcher(instance.getPublisher()).find())
             instance.setUniversity(instance.getPublisher());
+
+        //Удаляем пустые поля
+        instance.setFields(
+                instance.getFields()
+                        .entrySet()
+                        .stream()
+                        .filter(entry -> entry.getValue() != null && !entry.getValue().equals("") && PatternFactory.notEmptyFieldPattern.matcher(entry.getValue()).find())
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue , (a, b) -> a, LinkedHashMap::new)));
     }
 
     public String buildHarvard() {
@@ -70,43 +81,56 @@ public class HarvardBuilder {
                 .append(instance.getYear())
                 .append(instance.getTitle());
         if ("ARTICLE".equals(recordType)) {
-            builder.append(instance.getJournal());
-            builder.append(instance.getVolume());
-            builder.append(instance.getPages());
+            builder.append(instance.getJournal())
+                    .append(instance.getVolume())
+                    .append(instance.getPages());
         } else if ("BOOK".equals(recordType)) {
-            builder.append(instance.getPublisher());
-            builder.append(instance.getAddress());
+            builder.append(instance.getPublisher())
+                    .append(instance.getAddress());
         } else if ("INBOOK".equals(recordType)) {
-            instance.setTitleChapter("в " + instance.getTitleChapter());
-            builder.append(instance.getTitleChapter());
-            builder.append(instance.getPublisher());
-            builder.append(instance.getAddress());
-            builder.append(instance.getPages());
+            builder.append(instance.getTitleChapter())
+                    .append(instance.getPublisher())
+                    .append(instance.getAddress())
+                    .append(instance.getPages());
         }
         else if ("PHDTHESIS".equals(recordType)) {
-            builder.append("Abstract of bachelor dissertation");
-            builder.append(instance.getUniversity());
-            builder.append(instance.getAddress());
+            builder.append("Abstract of bachelor dissertation")
+                    .append(instance.getUniversity())
+                    .append(instance.getAddress());
         } else if ("MASTERSTHESIS".equals(recordType)) {
-            builder.append("Abstract of master dissertation");
-            builder.append(instance.getUniversity());
-            builder.append(instance.getAddress());
+            builder.append("Abstract of master dissertation")
+                    .append(instance.getUniversity())
+                    .append(instance.getAddress());
         } else if ("PROCEEDINGS".equals(recordType)) {
-            builder.append(instance.getConference());
-            builder.append(instance.getAddress());
-            builder.append(instance.getData());
-            builder.append(instance.getPages());
+            builder.append(instance.getConference())
+                    .append(instance.getAddress())
+                    .append(instance.getData())
+                    .append(instance.getPages());
         } else if ("INPROCEEDINGS".equals(recordType)) {
-            builder.append(instance.getConference());
-            builder.append(instance.getAddress());
-            builder.append(instance.getData());
-            builder.append(instance.getPages());
+            builder.append(instance.getConference())
+                    .append(instance.getAddress())
+                    .append(instance.getData())
+                    .append(instance.getPages());
         } else {
             builder = new StringBuilder();
             instance.getFields().values().forEach(builder::append);
         }
+
         builder.trimToSize();
-        builder.deleteCharAt(builder.length() - 2);
-        return builder.toString().replace(",,", ",");
+        String[] words = builder.toString().split(" ");
+        String field = null;
+        for (int i = words.length - 1; i >= 0; i--) {
+            field = words[i];
+            if (PatternFactory.notEmptyFieldPattern.matcher(field).find() && field.length() > 1) {
+                break;
+            }
+        }
+        String result = builder.toString();
+        if (field != null) return builder
+                .substring(0, result.lastIndexOf(field) + field.length())
+                .replaceAll("\\.\\s*[a-zA-Zа-яА-Я]?\\s*\\.", ".")
+                .replaceAll(",\\s*[,.]", ",")
+                .replaceAll(":\\s*[,.]", ":");
+        return result;
     }
 }

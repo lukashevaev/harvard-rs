@@ -17,35 +17,34 @@ public class PatternFactory {
 
     public PatternFactory() {
         patternsForType.put(RecordType.BOOK,
-                Pattern.compile("(" +
-                        "энциклопедия|" +
+                Pattern.compile("энциклопедия|" +
                         "encyclopaedia|" +
                         "сборник|" +
                         "собрание|" +
                         "сочинения|" +
                         "работы|" +
-                        "(в|in)\\s\\d+-?х?\\s(т|ч|vols)\\.?)$"));
+                        "(в|in)\\s\\d+-?х?\\s(т|ч|vols)\\.?$"));
         patternsForType.put(RecordType.PROCEEDINGS,
-                Pattern.compile("(proceedings|" +
+                Pattern.compile("proceedings|" +
                         "of\\s*(a|the)\\s*conference|" +
                         "conference|" +
                         "proceedings\\s*of|" +
                         "of\\s*(a|the).*\\s*colloquium|" +
                         "of\\s*symposia|" +
                         "symposium|" +
-                        "of\\s*(a|the)\\s*congress)"));
+                        "of\\s*(a|the)\\s*congress"));
         patternsForType.put(RecordType.INPROCEEDINGS,
                 Pattern.compile("inproceedings"));
         patternsForType.put(RecordType.ARTICLE,
-                Pattern.compile("(журнал|" +
+                Pattern.compile("журнал|" +
                         "journal|" +
                         "статья|" +
-                        "article)"));
+                        "article"));
         patternsForType.put(RecordType.ABSTRACT,
-                Pattern.compile("(abstract\\s*of|автореферат)"));
+                Pattern.compile("abstract\\s*of|автореферат"));
         patternsForType.put(RecordType.MASTERSTHESIS,
-                Pattern.compile("(дис.*маг|" +
-                        "(master(s)?)?\\s*thesis\\s*((of)?\\smaster)?)"));
+                Pattern.compile("дис.*маг|" +
+                        "(master(s)?)?\\s*thesis\\s*((of)?\\smaster)?"));
         patternsForType.put(RecordType.PHDTHESIS,
                 Pattern.compile("дис.*канд"));
         patternsForType.put(RecordType.PATENT,
@@ -97,4 +96,6 @@ public class PatternFactory {
     public static Pattern russianPattern = Pattern.compile(".*[а-яА-Я].*");
 
     public static final Pattern journalPattern = Pattern.compile("журнал|journal");
+
+    public static final Pattern notEmptyFieldPattern = Pattern.compile("[a-zA-Zа-яА-Я0-9]");
 }

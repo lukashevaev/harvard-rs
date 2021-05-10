@@ -12,7 +12,8 @@ public class TypeDefiner {
     private final HarvardInstance instance;
 
     public TypeDefiner(HarvardInstance instance){
-        patternsForType = PatternFactory.getPatternsForType();
+        PatternFactory factory = new PatternFactory();
+        patternsForType = factory.getPatternsForType();
         this.instance = instance;
         recordType = instance.getRecordType().toLowerCase();
         defineType();
