@@ -28,7 +28,7 @@ public class HarvardInstance {
     }
 
     public void setRecordType(String recordType) {
-        if (fields.get("recordType") == null) return;
+        //if (fields.get("recordType") == null) return;
         this.fields.put("recordType", recordType);
     }
 

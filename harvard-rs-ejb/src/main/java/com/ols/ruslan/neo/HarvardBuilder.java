@@ -56,6 +56,8 @@ public class HarvardBuilder {
         }
         // Год должен быть указан в ()
         instance.setYear("(" + instance.getYear() + ")");
+        instance.setEditor("в " + instance.getEditor() + "(ред.), ");
+        //instance.setOldType("(" + instance.getOldType() + ")");
         if (PatternFactory.universityPattern.matcher(instance.getPublisher()).find())
             instance.setUniversity(instance.getPublisher());
 
@@ -70,13 +72,14 @@ public class HarvardBuilder {
 
     public String buildHarvard() {
         StringBuilder builder = new StringBuilder();
-        instance.getFields().entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
+
         if ("INPROCEEDINGS".equals(recordType)
                 || "ARTICLE".equals(recordType)
                 || "PHDTHESIS".equals(recordType)
                 || "MASTERSTHESIS".equals(recordType)
                 || "INBOOK".equals(recordType)
         ) instance.setTitle("\"" + instance.getTitle() + "\"");
+        instance.getFields().entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
         builder.append(instance.getAuthor())
                 .append(instance.getYear())
                 .append(instance.getTitle());
@@ -85,8 +88,11 @@ public class HarvardBuilder {
                     .append(instance.getVolume())
                     .append(instance.getPages());
         } else if ("BOOK".equals(recordType)) {
-            builder.append(instance.getPublisher())
-                    .append(instance.getAddress());
+            builder.append(instance.getEdition())
+                    .append(instance.getEditor())
+                    .append(instance.getPublisher())
+                    .append(instance.getAddress())
+                    .append(instance.getPages());
         } else if ("INBOOK".equals(recordType)) {
             builder.append(instance.getTitleChapter())
                     .append(instance.getPublisher())
@@ -126,11 +132,20 @@ public class HarvardBuilder {
             }
         }
         String result = builder.toString();
-        if (field != null) return builder
-                .substring(0, result.lastIndexOf(field) + field.length())
-                .replaceAll("\\.\\s*[a-zA-Zа-яА-Я]?\\s*\\.", ".")
-                .replaceAll(",\\s*[,.]", ",")
-                .replaceAll(":\\s*[,.]", ":");
+        if (field != null) {
+            result = builder
+                    .substring(0, result.lastIndexOf(field) + field.length())
+                    .replaceAll("\\.\\s*[a-zA-Zа-яА-Я]?\\s*\\.", ".")
+                    //.replace("..", ".")
+                    .replaceAll(",\\s*[,.]", ",")
+                    .replaceAll(":\\s*[,.]", ":");
+
+            if (PatternFactory.notEmptyFieldPattern.matcher(
+                    String.valueOf(result.charAt(result.length() - 1))).find()) {
+                return result.concat(".");
+            } else return result.substring(0, result.length() - 1)
+                    .concat(".");
+        }
         return result;
     }
 }
