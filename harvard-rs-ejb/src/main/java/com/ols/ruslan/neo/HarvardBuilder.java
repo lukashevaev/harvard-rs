@@ -98,6 +98,7 @@ public class HarvardBuilder {
         if ("ARTICLE".equals(recordType)) {
             builder.append(instance.getJournal())
                     .append(instance.getVolume())
+                    .append(instance.getPublisher())
                     .append(instance.getPages());
         } else if ("BOOK".equals(recordType)) {
             builder.append(instance.getEdition())
