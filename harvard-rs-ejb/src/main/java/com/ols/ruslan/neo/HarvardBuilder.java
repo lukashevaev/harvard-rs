@@ -147,9 +147,11 @@ public class HarvardBuilder {
         if (field != null) {
             result = builder
                     .substring(0, result.lastIndexOf(field) + field.length())
-                    .replaceAll("\\.\\s*[a-zA-Zа-яА-Я]?\\s*\\.", ".")
+                    .replaceAll("\\.\\s*\\.", ".")
+                    .replaceAll("\\.[a-zA-Zа-яА-Я]?\\.", ".")
                     .replaceAll(",\\s*[,.]", ",")
                     .replaceAll(":\\s*[,.]", ":");
+
 
             if (PatternFactory.notEmptyFieldPattern.matcher(
                     String.valueOf(result.charAt(result.length() - 1))).find()) {
