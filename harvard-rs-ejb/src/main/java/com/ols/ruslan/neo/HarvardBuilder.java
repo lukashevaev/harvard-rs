@@ -37,7 +37,7 @@ public class HarvardBuilder {
             String[] authors = instance.getAuthor().split("-");
             switch (authors.length) {
                 case 1: {
-                    instance.setAuthor(authors[0].substring(0, authors[0].length() - 1));
+                    instance.setAuthor(authors[0]);//.substring(0, authors[0].length() - 1));
                     break;
                 }
                 case 2: {
@@ -80,9 +80,21 @@ public class HarvardBuilder {
                 || "INBOOK".equals(recordType)
         ) instance.setTitle("\"" + instance.getTitle() + "\"");
         instance.getFields().entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
-        builder.append(instance.getAuthor())
-                .append(instance.getYear())
-                .append(instance.getTitle());
+        if (!instance.getAuthor().equals("")) {
+            builder.append(instance.getAuthor())
+                    .append(instance.getYear())
+                    .append(instance.getTitle());
+        }
+        else if (!instance.getEditor().equals("")){
+            builder.append(instance.getEditor())
+                    .append(instance.getYear())
+                    .append(instance.getTitle());
+        }
+        else{
+            builder.append(instance.getTitle())
+                    .append(instance.getYear());
+        }
+
         if ("ARTICLE".equals(recordType)) {
             builder.append(instance.getJournal())
                     .append(instance.getVolume())
@@ -136,15 +148,16 @@ public class HarvardBuilder {
             result = builder
                     .substring(0, result.lastIndexOf(field) + field.length())
                     .replaceAll("\\.\\s*[a-zA-Zа-яА-Я]?\\s*\\.", ".")
-                    //.replace("..", ".")
                     .replaceAll(",\\s*[,.]", ",")
                     .replaceAll(":\\s*[,.]", ":");
 
             if (PatternFactory.notEmptyFieldPattern.matcher(
                     String.valueOf(result.charAt(result.length() - 1))).find()) {
-                return result.concat(".");
+                return result.concat(".")
+                        .replaceAll("\\.\\.", ".");
             } else return result.substring(0, result.length() - 1)
-                    .concat(".");
+                    .concat(".")
+                    .replaceAll("\\.\\.", ".");
         }
         return result;
     }
