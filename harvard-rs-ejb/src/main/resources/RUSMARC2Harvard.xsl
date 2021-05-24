@@ -229,7 +229,14 @@
                 </address>
 
                 <pages>
-                    <xsl:value-of select="field[@id='215']/subfield[@id='a']" />
+                    <xsl:choose>
+                        <xsl:when test="field[@id='215']/subfield[@id='a']">
+                            <xsl:value-of select="field[@id='215']/subfield[@id='a']" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="field[@id='463']/subfield[@id='1']/field[@id='200']/subfield[@id='v']" />
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </pages>
 
                 <url>
@@ -277,7 +284,7 @@
                 <xsl:if test="subfield[@id='b']">
                     <xsl:text> </xsl:text>
                     <xsl:value-of select="subfield[@id='b']" />
-                    <xsl:text>, --</xsl:text>
+                    <xsl:text>-</xsl:text>
                 </xsl:if>
             </xsl:otherwise>
         </xsl:choose>

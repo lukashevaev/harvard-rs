@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HarvardBuilder {
@@ -25,7 +26,16 @@ public class HarvardBuilder {
 
     // Метод для выделения цифр из поля
     public String getDigits(String field) {
-        return field.replaceAll("[^0-9]", "");
+        return field.replaceAll("[^0-9-]", "");
+    }
+
+    private Integer getPosition(String[] array, String destination) {
+        for (int i = 0; i <= array.length; i++) {
+            if (Objects.equals(array[i], destination)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private void refactorFields() throws IOException {
@@ -33,30 +43,42 @@ public class HarvardBuilder {
         instance.setTitleChapter("в " + instance.getTitleChapter());
         if (!"".equals(instance.getVolume()) && !"".equals(instance.getNumber())) instance.deleteNumber();
         // Запись вида автор1,автор2, ... авторn and авторn+1
-        if (!instance.getAuthor().equals("")) {
-            String[] authors = instance.getAuthor().split("-");
-            switch (authors.length) {
-                case 1: {
-                    instance.setAuthor(authors[0]);//.substring(0, authors[0].length() - 1));
-                    break;
+        instance.getAuthor().ifPresent(author -> {
+            String[] allAuthors = author.split("-");
+            StringBuilder builder = new StringBuilder();
+            Arrays.stream(allAuthors).forEach(fullName -> {
+                String[] authors = fullName.trim().split(" ");
+                //Arrays.stream(authors).forEach(s -> s = s.replaceAll(",", "").trim());
+                String name = authors[0].trim() + ", ";
+                builder.append(name);
+                Arrays.stream(authors).skip(1).forEach(str -> builder.append(str.trim()).append(" "));
+                if (allAuthors.length >= 2) {
+                    Integer position = getPosition(allAuthors, fullName);
+                    if (position != allAuthors.length - 2) {
+                        builder.append(", ");
+                    } else {
+                        builder.append(" and ");
+                    }
+                } else {
+                    builder.append(" and ");
                 }
-                case 2: {
-                    instance.setAuthor(authors[0].substring(0, authors[0].length() - 1) + " and " + authors[1].substring(0, authors[1].length() - 1));
-                    break;
+            });
+            if (allAuthors.length == 1) {
+                instance.setAuthor(builder.toString().replaceAll(" and ", "").trim());
+            } else {
+                String result = builder.toString().trim();
+                if (result.endsWith(",")) {
+                    result = result.substring(0, result.length() - 1);
                 }
-                default: {
-                    StringBuilder author = new StringBuilder();
-                    Arrays.stream(authors).forEach(author::append);
-                    author.replace(author.lastIndexOf(","), author.lastIndexOf(",") + 1, "");
-                    author.replace(author.lastIndexOf(","), author.lastIndexOf(",") + 1, " and ");
-                    instance.setAuthor(author.toString());
-                    break;
-                }
+                instance.setAuthor(result);
             }
-        }
+        });
+
         // Год должен быть указан в ()
         instance.setYear("(" + instance.getYear() + ")");
         instance.setEditor("в " + instance.getEditor() + "(ред.), ");
+        instance.setVolume("том. " + getDigits(instance.getVolume()));
+        instance.setNumber("№ " + getDigits(instance.getNumber()));
         //instance.setOldType("(" + instance.getOldType() + ")");
         if (PatternFactory.universityPattern.matcher(instance.getPublisher()).find())
             instance.setUniversity(instance.getPublisher());
@@ -80,8 +102,8 @@ public class HarvardBuilder {
                 || "INBOOK".equals(recordType)
         ) instance.setTitle("\"" + instance.getTitle() + "\"");
         instance.getFields().entrySet().forEach(entry -> entry.setValue(entry.getValue() + ", "));
-        if (!instance.getAuthor().equals("")) {
-            builder.append(instance.getAuthor())
+        if (instance.getAuthor().isPresent()) {
+            builder.append(instance.getAuthor().get())
                     .append(instance.getYear())
                     .append(instance.getTitle());
         }
@@ -97,13 +119,16 @@ public class HarvardBuilder {
 
         if ("ARTICLE".equals(recordType)) {
             builder.append(instance.getJournal())
+                    .append(instance.getPublisher())
                     .append(instance.getVolume())
                     .append(instance.getPublisher())
                     .append(instance.getPages());
         } else if ("BOOK".equals(recordType)) {
-            builder.append(instance.getEdition())
-                    .append(instance.getEditor())
-                    .append(instance.getPublisher())
+            builder.append(instance.getEdition());
+            if (instance.getAuthor().isPresent()) {
+                builder.append(instance.getEditor());
+            }
+            builder.append(instance.getPublisher())
                     .append(instance.getAddress())
                     .append(instance.getPages());
         } else if ("INBOOK".equals(recordType)) {
@@ -149,10 +174,9 @@ public class HarvardBuilder {
             result = builder
                     .substring(0, result.lastIndexOf(field) + field.length())
                     .replaceAll("\\.\\s*\\.", ".")
-                    .replaceAll("\\.[a-zA-Zа-яА-Я]?\\.", ".")
+                    //.replaceAll("\\.[a-zA-Zа-яА-Я]?\\.", ".")
                     .replaceAll(",\\s*[,.]", ",")
                     .replaceAll(":\\s*[,.]", ":");
-
 
             if (PatternFactory.notEmptyFieldPattern.matcher(
                     String.valueOf(result.charAt(result.length() - 1))).find()) {

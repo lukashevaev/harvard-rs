@@ -57,27 +57,27 @@ public class PatternFactory {
      * Если поле совпадает с паттерном "digits-digits"
      * Например "10-20", "345-466"
      */
-    public static final Pattern pagesPattern = Pattern.compile("\\D*\\d*-\\d*");
+    public static final Pattern pagesPattern = Pattern.compile("\\D*\\d+-\\d+");
 
     /**
      * Для поля "volume"
      * Если поле совпадает с паттерном : "chapter 3", "#5", "№ 9", "том 8", "vol № 12"
      * Проверка, что поле является томом или главой
      */
-    public static final Pattern volumePattern = Pattern.compile("^((том|vol|chapter|[nтpч№#]|part|часть)\\.?\\s*[нn№#]?\\s*\\d*)");
+    public static final Pattern volumePattern = Pattern.compile("^((том|vol|chapter|[nтpч№#]|part|часть)\\.?\\s*[нn№#]?\\s*\\d+)");
 
     /**
      * Для поля "number"
      * Если поле совпадает с паттерном : "N. 15", "number 8", "№ 9"
      * Проверка, что поле является номером журнала
      */
-    public static final Pattern numberPattern = Pattern.compile("^(([#№n]|number)\\.?\\s*\\d*)");
+    public static final Pattern numberPattern = Pattern.compile("^(([#№n]|number)\\.?\\s*\\d+)");
 
     /** Для поля "pages"
      * Если поле совпадает с паттерном "digits"
      * Например "10 стр", "345 pages"
      */
-    public static final Pattern pagePattern = Pattern.compile("\\d*\\s*(pages|[pсc]|стр|страниц)\\.?");
+    public static final Pattern pagePattern = Pattern.compile("\\d+\\s*(pages|[pсc]|стр|страниц)\\.?");
 
     public static final Pattern spbPattern = Pattern.compile("s[.-]?pb");
 

@@ -1,6 +1,7 @@
 package com.ols.ruslan.neo;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Данный класс хранит в себе поля и дает к ним доступ
@@ -68,8 +69,8 @@ public class HarvardInstance {
         this.fields.put("university", university);
     }
 
-    public String getAuthor() {
-        return fields.get("author") != null ? fields.get("author") : "";
+    public Optional<String> getAuthor() {
+        return Optional.ofNullable(fields.get("author"));
     }
 
     public void setAuthor(String author) {
