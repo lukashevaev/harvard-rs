@@ -12,6 +12,8 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -28,6 +30,10 @@ public class XmlToHarvardTransformer implements MediaTypeTransformerFacade {
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
     private static Templates templates;
 
+    private static final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    private Transformer transformer;
+    private DocumentBuilder builder;
+
 
     @PostConstruct
     void startup() {
@@ -36,6 +42,11 @@ public class XmlToHarvardTransformer implements MediaTypeTransformerFacade {
             templates = transformerFactory.newTemplates(new StreamSource(
                     XmlToHarvardTransformer.class.getClassLoader().getResourceAsStream(
                             "RUSMARC2Harvard.xsl")));
+
+            // Создаем трансформер для преобразования одного xml в другой
+            transformer = templates.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+           // builder = factory.newDocumentBuilder();
 
         } catch (TransformerConfigurationException e) {
             log.severe("Unable to initialise templates: " + e.getMessage());
@@ -60,10 +71,36 @@ public class XmlToHarvardTransformer implements MediaTypeTransformerFacade {
         // Трансформация,парсинг и создание нового формата
         transformer.transform(new DOMSource(document), result);
         Map<String, String> fields = XmlParser.parse((Document) result.getNode());
-        HarvardBuilder bibTexBuilder = new HarvardBuilder(fields);
+        HarvardBuilder harvardBuilder = new HarvardBuilder(fields);
 
-        return bibTexBuilder.buildHarvard().getBytes(encoding);
+        return harvardBuilder.buildHarvard().getBytes(encoding);
     }
 
+    public String transformTest(byte[] content) throws Exception {
+        DOMResult result = new DOMResult();
+
+        // Создаем источник для преобразования из поступившего массива байт
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new ByteArrayInputStream(content));
+
+        //Трансформация,парсинг и создание нового формата
+        transformer.transform(new DOMSource(document), result);
+        Map<String, String> fields = XmlParser.parse((Document) result.getNode());
+        HarvardBuilder harvardBuilder = new HarvardBuilder(fields);
+        String harvard = harvardBuilder.buildHarvard();
+        fillHarvardFile(harvard);
+        return harvard;
+    }
+
+    private void fillHarvardFile(String harvard) {
+        try (FileWriter writer = new FileWriter("src/main/resources/harvard.txt", false)) {
+            writer.write(harvard);
+
+            writer.flush();
+        } catch(IOException ex){
+            System.out.println(ex.getMessage());
+        }
+    }
 }
 

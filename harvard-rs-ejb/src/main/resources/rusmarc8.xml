@@ -1,0 +1,72 @@
+<record syntax="1.2.840.10003.5.28.1">
+    <leader>
+        <length>00612</length>
+        <status>n</status>
+        <type>a</type>
+        <leader07>m</leader07>
+        <leader08> </leader08>
+        <leader09>a</leader09>
+        <indicatorCount>2</indicatorCount>
+        <identifierLength>2</identifierLength>
+        <dataBaseAddress>00145</dataBaseAddress>
+        <leader17>3</leader17>
+        <leader18>i</leader18>
+        <leader19> </leader19>
+        <entryMap>450 </entryMap>
+    </leader>
+    <field id="001">8</field>
+    <field id="005">20200917161144.8</field>
+    <field id="100">
+        <indicator id="1"> </indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">20200917 rus 50 ca</subfield>
+    </field>
+    <field id="200">
+        <indicator id="1">1</indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">Большой немецко-русский словарь</subfield>
+        <subfield id="e">в 2 т.</subfield>
+        <subfield id="f">Сост.Е.И.Лепинг,Н.П.Страхова,Н.И.Филичева и др.;Под рук.О.И.Москальской</subfield>
+        <subfield id="h">Т. 1</subfield>
+        <subfield id="i">iii</subfield>
+    </field>
+    <field id="205">
+        <indicator id="1"> </indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">2-е изд.,стереотип.</subfield>
+    </field>
+    <field id="210">
+        <indicator id="1"> </indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">М.</subfield>
+        <subfield id="c">Рус. язык</subfield>
+        <subfield id="d">1980</subfield>
+    </field>
+    <field id="215">
+        <indicator id="1"> </indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">760с.</subfield>
+    </field>
+    <field id="300">
+        <indicator id="1"> </indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">/В пер./:14р.70к.</subfield>
+    </field>
+    <field id="610">
+        <indicator id="1">1</indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">Иностранный язык</subfield>
+        <subfield id="a">Немецкий язык</subfield>
+    </field>
+    <field id="686">
+        <indicator id="1"> </indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="2">rubbk</subfield>
+        <subfield id="a">81.432.4-4</subfield>
+    </field>
+    <field id="998">
+        <indicator id="1"> </indicator>
+        <indicator id="2"> </indicator>
+        <subfield id="a">бонеслмрус19800000</subfield>
+    </field>
+</record>
